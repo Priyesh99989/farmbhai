@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FarmDirect - Farmer Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #1e3a1e;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a1e, #2d5a2c);
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+        }
+        .header h1 { font-size: 1.8rem; }
+        .badge {
+            background: #ffb74d;
+            color: #1e3a1e;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        .language-selector {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .lang-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            margin: 0 5px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .login-container, .dashboard-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 32px;
+            padding: 35px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 40px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .farmer-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4caf50;
+        }
+        .earnings {
+            background: #e8f5e9;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .earnings h2 {
+            font-size: 2rem;
+            color: #2e7d32;
+        }
+        .order-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .nav-menu {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .nav-menu a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        .logout-btn {
+            background: #f44336;
+            margin-top: 20px;
+        }
+        .product-image { font-size: 3rem; text-align: center; margin-bottom: 10px; }
+        @media (max-width: 600px) {
+            .login-container, .dashboard-container { margin: 20px; padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 id="mainTitle">👨‍🌾 రైతు పోర్టల్</h1>
+    <p id="subTitle">FarmDirect - Farmer First</p>
+    <div class="badge">🤝 Zero Profit | 82% to Farmer</div>
+    <div class="language-selector">
+        <button class="lang-btn" onclick="setLanguage('te')">తెలుగు</button>
+        <button class="lang-btn" onclick="setLanguage('hi')">हिन्दी</button>
+        <button class="lang-btn" onclick="setLanguage('en')">English</button>
+    </div>
+    <div class="nav-menu">
+        <a href="index.html">🏠 Home</a>
+        <a href="farmer.html">👨‍🌾 Farmer Portal</a>
+    </div>
+</div>
+
+<!-- Login Section -->
+<div id="loginSection" class="login-container">
+    <div class="product-image">🌾</div>
+    <h2 id="loginTitle">Farmer Login</h2>
+    <p id="loginSubtitle">Enter your registered phone number</p>
+    <input type="tel" id="farmerPhone" maxlength="10" placeholder="9876543210">
+    <button onclick="sendFarmerOTP()" id="sendOtpBtn">Send OTP</button>
+    <div id="otpSection" style="display:none; margin-top:15px;">
+        <input type="text" id="farmerOtp" placeholder="Enter OTP" maxlength="6">
+        <button onclick="verifyFarmerOTP()">Verify & Login</button>
+    </div>
+    <div id="loginMessage"></div>
+</div>
+
+<!-- Dashboard Section -->
+<div id="dashboardSection" style="display:none;">
+    <div class="dashboard-container">
+        <div class="product-image" id="farmerProductIcon">🌾</div>
+        <h2 id="welcomeMsg">Welcome, <span id="farmerName"></span>!</h2>
+        
+        <div class="earnings">
+            <p id="totalEarningsLabel">💰 Total Earnings</p>
+            <h2 id="totalEarnings">₹0</h2>
+            <p id="ordersCountLabel">📦 Total Orders</p>
+            <p id="ordersCount">0</p>
+        </div>
+        
+        <h3 id="ordersTitle">📋 Your Orders</h3>
+        <div id="farmerOrdersList"></div>
+        
+        <button class="logout-btn" onclick="logoutFarmer()" id="logoutBtn">Logout</button>
+    </div>
+</div>
+
+<script>
+    // Language translations
+    const translations = {
+        te: {
+            mainTitle: "👨‍🌾 రైతు పోర్టల్",
+            subTitle: "FarmDirect - రైతుకు ప్రాధాన్యత",
+            loginTitle: "రైతు లాగిన్",
+            loginSubtitle: "మీ రిజిస్టర్ చేసిన ఫోన్ నంబర్ నమోదు చేయండి",
+            sendOtp: "OTP పంపండి",
+            welcome: "స్వాగతం",
+            totalEarnings: "💰 మొత్తం ఆదాయం",
+            ordersCount: "📦 మొత్తం ఆర్డర్లు",
+            ordersTitle: "📋 మీ ఆర్డర్లు",
+            orderId: "ఆర్డర్ ID",
+            product: "ఉత్పత్తి",
+            quantity: "పరిమాణం",
+            total: "మొత్తం",
+            customer: "కస్టమర్",
+            date: "తేదీ",
+            logout: "లాగౌట్",
+            noOrders: "ఇంకా ఆర్డర్లు లేవు",
+            loading: "లోడ్ అవుతుంది...",
+            farmerShare: "రైతుకు వచ్చేది"
+        },
+        hi: {
+            mainTitle: "👨‍🌾 किसान पोर्टल",
+            subTitle: "FarmDirect - किसान पहले",
+            loginTitle: "किसान लॉगिन",
+            loginSubtitle: "अपना रजिस्टर्ड फोन नंबर दर्ज करें",
+            sendOtp: "OTP भेजें",
+            welcome: "स्वागत है",
+            totalEarnings: "💰 कुल कमाई",
+            ordersCount: "📦 कुल ऑर्डर",
+            ordersTitle: "📋 आपके ऑर्डर",
+            orderId: "ऑर्डर ID",
+            product: "उत्पाद",
+            quantity: "मात्रा",
+            total: "कुल",
+            customer: "ग्राहक",
+            date: "तारीख",
+            logout: "लॉगआउट",
+            noOrders: "अभी कोई ऑर्डर नहीं",
+            loading: "लोड हो रहा है...",
+            farmerShare: "किसान को मिलेगा"
+        },
+        en: {
+            mainTitle: "👨‍🌾 Farmer Portal",
+            subTitle: "FarmDirect - Farmer First",
+            loginTitle: "Farmer Login",
+            loginSubtitle: "Enter your registered phone number",
+            sendOtp: "Send OTP",
+            welcome: "Welcome",
+            totalEarnings: "💰 Total Earnings",
+            ordersCount: "📦 Total Orders",
+            ordersTitle: "📋 Your Orders",
+            orderId: "Order ID",
+            product: "Product",
+            quantity: "Quantity",
+            total: "Total",
+            customer: "Customer",
+            date: "Date",
+            logout: "Logout",
+            noOrders: "No orders yet",
+            loading: "Loading...",
+            farmerShare: "Farmer gets"
+        }
+    };
+    
+    let currentLang = 'te';
+    let currentFarmer = null;
+    let generatedOTP = null;
+    
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+        document.getElementById('mainTitle').innerText = t.mainTitle;
+        document.getElementById('subTitle').innerText = t.subTitle;
+        document.getElementById('loginTitle').innerText = t.loginTitle;
+        document.getElementById('loginSubtitle').innerText = t.loginSubtitle;
+        document.getElementById('sendOtpBtn').innerText = t.sendOtp;
+        if (document.getElementById('welcomeMsg')) {
+            document.getElementById('welcomeMsg').innerHTML = `${t.welcome}, <span id="farmerName"></span>!`;
+            document.getElementById('totalEarningsLabel').innerText = t.totalEarnings;
+            document.getElementById('ordersCountLabel').innerHTML = t.ordersCount;
+            document.getElementById('ordersTitle').innerText = t.ordersTitle;
+            document.getElementById('logoutBtn').innerText = t.logout;
+        }
+        localStorage.setItem('farmer_lang', lang);
+    }
+    
+    async function sendFarmerOTP() {
+        const phone = document.getElementById('farmerPhone').value.trim();
+        
+        let invalidMsg = '';
+        let emptyMsg = '';
+        
+        if (currentLang === 'te') {
+            emptyMsg = '❌ దయచేసి ఫోన్ నంబర్ నమోదు చేయండి';
+            invalidMsg = '❌ దయచేసి 10 అంకెల చెల్లుబాటు అయ్యే ఫోన్ నంబర్ నమోదు చేయండి (6,7,8,9 తో మొదలవ్వాలి)';
+        } else if (currentLang === 'hi') {
+            emptyMsg = '❌ कृपया फोन नंबर दर्ज करें';
+            invalidMsg = '❌ कृपया 10 अंकों का मान्य फोन नंबर दर्ज करें (6,7,8,9 से शुरू)';
+        } else {
+            emptyMsg = '❌ Please enter phone number';
+            invalidMsg = '❌ Please enter a valid 10-digit phone number (must start with 6,7,8, or 9)';
+        }
+        
+        if (phone === '') {
+            document.getElementById('loginMessage').innerHTML = `<div style="color:#c62828;">${emptyMsg}</div>`;
+            return;
+        }
+        
+        if (!/^[6-9]\d{9}$/.test(phone)) {
+            document.getElementById('loginMessage').innerHTML = `<div style="color:#c62828;">${invalidMsg}</div>`;
+            return;
+        }
+        
+        try {
+            const response = await fetch(FARMER_SCRIPT_URL);
+            const data = await response.json();
+            
+            const farmer = data.farmers.find(f => f.phone === phone);
+            
+            if (farmer) {
+                currentFarmer = farmer;
+                generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                let otpMsg = '';
+                if (currentLang === 'te') otpMsg = `మీ OTP: ${generatedOTP}`;
+                else if (currentLang === 'hi') otpMsg = `आपका OTP: ${generatedOTP}`;
+                else otpMsg = `Your OTP is: ${generatedOTP}`;
+                alert(otpMsg);
+                
+                document.getElementById('otpSection').style.display = 'block';
+                
+                let successMsg = '';
+                if (currentLang === 'te') successMsg = '✅ OTP పంపబడింది!';
+                else if (currentLang === 'hi') successMsg = '✅ OTP भेज दिया गया!';
+                else successMsg = '✅ OTP sent!';
+                document.getElementById('loginMessage').innerHTML = `<div style="color:#2e7d32;">${successMsg}</div>`;
+            } else {
+                let notFoundMsg = '';
+                if (currentLang === 'te') notFoundMsg = '❌ రైతు కనుగొనబడలేదు. అడ్మిన్ను సంప్రదించండి.';
+                else if (currentLang === 'hi') notFoundMsg = '❌ किसान नहीं मिला। एडमिन से संपर्क करें।';
+                else notFoundMsg = '❌ Farmer not found. Contact admin.';
+                document.getElementById('loginMessage').innerHTML = `<div style="color:#c62828;">${notFoundMsg}</div>`;
+            }
+        } catch(err) {
+            let errorMsg = '';
+            if (currentLang === 'te') errorMsg = '❌ నెట్వర్క్ సమస్య. దయచేసి మళ్లీ ప్రయత్నించండి.';
+            else if (currentLang === 'hi') errorMsg = '❌ नेटवर्क समस्या। कृपया पुनः प्रयास करें।';
+            else errorMsg = '❌ Network error. Please try again.';
+            document.getElementById('loginMessage').innerHTML = `<div style="color:#c62828;">${errorMsg}</div>`;
+        }
+    }
+    
+    async function verifyFarmerOTP() {
+        const enteredOTP = document.getElementById('farmerOtp').value.trim();
+        if (enteredOTP !== generatedOTP) {
+            let invalidOtpMsg = '';
+            if (currentLang === 'te') invalidOtpMsg = '❌ తప్పు OTP. దయచేసి మళ్లీ ప్రయత్నించండి.';
+            else if (currentLang === 'hi') invalidOtpMsg = '❌ गलत OTP. कृपया पुनः प्रयास करें।';
+            else invalidOtpMsg = '❌ Invalid OTP. Please try again.';
+            document.getElementById('loginMessage').innerHTML = `<div style="color:#c62828;">${invalidOtpMsg}</div>`;
+            return;
+        }
+        
+        localStorage.setItem('farmer_logged_in', JSON.stringify(currentFarmer));
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('dashboardSection').style.display = 'block';
+        document.getElementById('farmerName').innerText = currentFarmer.name;
+        
+        await loadFarmerOrders();
+    }
+    
+    async function loadFarmerOrders() {
+        const orders = JSON.parse(localStorage.getItem('farmdirect_orders')) || [];
+        const farmerOrders = orders.filter(o => o.product === currentFarmer.product);
+        
+        const totalEarnings = farmerOrders.reduce((sum, o) => sum + (o.total * 0.82), 0);
+        const t = translations[currentLang];
+        
+        document.getElementById('totalEarnings').innerText = `₹${Math.round(totalEarnings)}`;
+        document.getElementById('ordersCount').innerText = farmerOrders.length;
+        
+        const container = document.getElementById('farmerOrdersList');
+        if (farmerOrders.length === 0) {
+            container.innerHTML = `<p>${t.noOrders}</p>`;
+            return;
+        }
+        
+        let html = '';
+        farmerOrders.forEach(order => {
+            const farmerShare = Math.round(order.total * 0.82);
+            
+            let orderIdLabel, productLabel, quantityLabel, totalLabel, farmerShareLabel, customerLabel, dateLabel;
+            
+            if (currentLang === 'te') {
+                orderIdLabel = '📋 ఆర్డర్ నంబర్';
+                productLabel = '🌾 ఉత్పత్తి';
+                quantityLabel = '⚖️ బరువు';
+                totalLabel = '💰 మొత్తం';
+                farmerShareLabel = '👨‍🌾 రైతుకు వచ్చేది';
+                customerLabel = '👤 కస్టమర్';
+                dateLabel = '📅 తేదీ';
+            } else if (currentLang === 'hi') {
+                orderIdLabel = '📋 ऑर्डर नंबर';
+                productLabel = '🌾 उत्पाद';
+                quantityLabel = '⚖️ मात्रा';
+                totalLabel = '💰 कुल';
+                farmerShareLabel = '👨‍🌾 किसान को मिलेगा';
+                customerLabel = '👤 ग्राहक';
+                dateLabel = '📅 तारीख';
+            } else {
+                orderIdLabel = '📋 Order ID';
+                productLabel = '🌾 Product';
+                quantityLabel = '⚖️ Quantity';
+                totalLabel = '💰 Total';
+                farmerShareLabel = '👨‍🌾 Farmer gets';
+                customerLabel = '👤 Customer';
+                dateLabel = '📅 Date';
+            }
+            
+            html += `<div class="order-item" style="background:${currentLang === 'te' ? '#fef9e6' : 'white'};">
+                        <p><strong>${orderIdLabel}:</strong> ${order.orderId}</p>
+                        <p><strong>${productLabel}:</strong> ${order.product}</p>
+                        <p><strong>${quantityLabel}:</strong> ${order.quantity} kg</p>
+                        <p><strong>${totalLabel}:</strong> ₹${order.total}</p>
+                        <p style="background:#e8f5e9; padding:8px; border-radius:10px; margin-top:8px;">
+                            <strong>${farmerShareLabel}:</strong> ₹${farmerShare} (82%)
+                        </p>
+                        <p><strong>${customerLabel}:</strong> ${order.name || 'N/A'}</p>
+                        <p><strong>${dateLabel}:</strong> ${order.delivery_date || order.timestamp || 'N/A'}</p>
+                        <hr style="margin:10px 0;">
+                    </div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    function logoutFarmer() {
+        localStorage.removeItem('farmer_logged_in');
+        document.getElementById('dashboardSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('farmerPhone').value = '';
+        document.getElementById('farmerOtp').value = '';
+        document.getElementById('otpSection').style.display = 'none';
+        document.getElementById('loginMessage').innerHTML = '';
+        currentFarmer = null;
+    }
+    
+    // Check if farmer already logged in
+    const savedFarmer = localStorage.getItem('farmer_logged_in');
+    if (savedFarmer) {
+        currentFarmer = JSON.parse(savedFarmer);
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('dashboardSection').style.display = 'block';
+        document.getElementById('farmerName').innerText = currentFarmer.name;
+        loadFarmerOrders();
+    }
+    
+    // Load saved language
+    const savedLang = localStorage.getItem('farmer_lang');
+    if (savedLang) setLanguage(savedLang);
+    else setLanguage('te');
+</script>
+</body>
+</html>

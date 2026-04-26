@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FarmDirect - Market Prices</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f7e8; color: #1a3d1a; }
+        .header { background: linear-gradient(135deg, #2d5a2c, #1a4d1a); color: white; text-align: center; padding: 40px 20px; }
+        .header h1 { font-size: 2rem; }
+        .badge { background: #ffb74d; color: #1a3d1a; display: inline-block; padding: 5px 15px; border-radius: 20px; margin-top: 15px; font-weight: bold; }
+        .nav-menu { text-align: center; margin-top: 20px; }
+        .nav-menu a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+        .comparison-table { max-width: 1000px; margin: 30px auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2d5a2c; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; }
+        .highlight { background: #e8f5e9; font-weight: bold; }
+        .note { background: #fff3e0; padding: 20px; border-radius: 10px; margin: 20px; text-align: center; }
+        .footer { background: #1a3d1a; color: #ccc; text-align: center; padding: 20px; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📊 Market Price Comparison</h1>
+    <p>See how FarmDirect gives farmers a better deal</p>
+    <div class="badge">🤝 Farmer First | Zero Middlemen | Zero Profit on Rice</div>
+    <div class="nav-menu">
+        <a href="index.html">🏠 Home</a>
+        <a href="price.html">💰 Price Breakdown</a>
+        <a href="market.html">📊 Market Prices</a>
+        <a href="farmers.html">👨‍🌾 Our Farmers</a>
+        <a href="dashboard.html">📋 Dashboard</a>
+        <a href="track.html">📍 Track Order</a>
+        <a href="feedback.html">📝 Feedback</a>
+    </div>
+</div>
+
+<div class="comparison-table">
+    <h2>Rice Price Comparison (per 50kg bag)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Price (50kg)</th>
+                <th>Farmer Gets</th>
+                <th>Middlemen/Costs</th>
+                <th>Fair Trade?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Telangana Market</strong></strong>
+                <td>₹2,400 - ₹2,550</strong>
+                <td>₹800 - ₹1,000</strong>
+                <td>₹1,400 - ₹1,750</strong>
+                <td>❌ No</strong>
+            </tr>
+            <tr>
+                <td><strong>Andhra Pradesh Market</strong></strong>
+                <td>₹2,100 - ₹2,250</strong>
+                <td>₹700 - ₹900</strong>
+                <td>₹1,200 - ₹1,550</strong>
+                <td>❌ No</strong>
+            </tr>
+            <tr class="highlight">
+                <td><strong>🌾 FarmDirect Model</strong></strong>
+                <td><strong>₹2,200</strong></strong>
+                <td><strong>₹1,800</strong></strong>
+                <td><strong>₹400</strong> (delivery + packaging)</strong>
+                <td><strong>✅ YES</strong></strong>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="note">
+    <strong>📌 Why FarmDirect is Different</strong><br><br>
+    • Farmer gets <strong>₹1,800</strong> per 50kg — <strong>2-3x more</strong> than market average<br>
+    • No middlemen taking 70% of the profit<br>
+    • Only delivery + packaging costs added (₹400)<br>
+    • You pay <strong>₹2,200</strong> — less than market price, but farmer earns fairly
+</div>
+
+<div class="footer"><p>🌾 FarmDirect — Farmer First, Zero Profit on Rice</p></div>
+</body>
+</html>

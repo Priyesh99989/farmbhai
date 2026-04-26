@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmDirect - Fresh from Farmers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7f0 0%, #e8f0e5 100%);
+            color: #1e3a1e;
+            min-height: 100vh;
+        }
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3a1e, #2d5a2c);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .login-container {
+            background: rgba(255,255,255,0.98);
+            border-radius: 32px;
+            padding: 48px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        .farmer-logo { font-size: 4rem; margin-bottom: 8px; }
+        .login-container h1 { font-size: 2rem; color: #2d5a2c; margin-bottom: 8px; }
+        .login-container p { color: #666; margin-bottom: 24px; }
+        .login-container input, .login-container textarea {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 10px 0;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 1rem;
+        }
+        .login-container input:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+        }
+        .login-container button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        #mainContent { display: none; }
+        .header {
+            background: linear-gradient(135deg, #1e3a1e, #2d5a2c);
+            color: white;
+            text-align: center;
+            padding: 32px 20px;
+            border-radius: 0 0 40px 40px;
+        }
+        .header h1 { font-size: 2rem; font-weight: 700; }
+        .badge {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 40px;
+            margin-top: 16px;
+        }
+        .language-selector { margin-top: 20px; display: flex; justify-content: center; gap: 8px; }
+        .language-selector button {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .nav-menu { margin-top: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .nav-menu a {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        #userInfoBar {
+            background: rgba(76,175,80,0.12);
+            margin: 20px;
+            padding: 16px 24px;
+            border-radius: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-weight: 500;
+        }
+        #userInfoBar button {
+            background: #ffb74d;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .search-filter-bar {
+            background: white;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin: 0 20px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .filter-btn.active { background: #4caf50; color: white; }
+        .search-box { display: flex; gap: 8px; }
+        .search-box input {
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            width: 200px;
+        }
+        .search-box button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 40px 20px 24px;
+            color: #1e3a1e;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: #4caf50;
+            margin: 12px auto 0;
+            border-radius: 3px;
+        }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .product-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            width: 260px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(76,175,80,0.2);
+            position: relative;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+            border-color: #4caf50;
+        }
+        .product-image { font-size: 3.5rem; margin-bottom: 10px; }
+        .product-title { font-size: 1.3rem; font-weight: 700; color: #2d5a2c; margin: 12px 0 8px; }
+        .price { font-size: 2rem; font-weight: 800; color: #1e3a1e; }
+        .price small { font-size: 0.9rem; font-weight: 400; }
+        .farmer-share { background: #e8f5e9; padding: 8px 12px; border-radius: 40px; font-size: 0.75rem; display: inline-block; margin: 10px 0; }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .qty-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .qty-btn:hover { background: #2e7d32; }
+        .qty-value { font-size: 1.2rem; font-weight: 600; width: 40px; text-align: center; }
+        .wishlist-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: #5a6e5a;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+        }
+        .submit-btn {
+            background: #4caf50;
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .cancel-btn {
+            background: #e2e8f0;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .success { background: #c8e6c9; color: #2e7d32; padding: 15px; border-radius: 12px; margin-top: 15px; display: none; text-align: center; }
+        .error { background: #ffcdd2; color: #c62828; padding: 15px; border-radius: 12px; margin-top: 15px; display: none; text-align: center; }
+        @media (max-width: 768px) {
+            .products { gap: 16px; }
+            .product-card { width: calc(50% - 16px); padding: 16px; }
+            .product-image { font-size: 2.5rem; }
+            #userInfoBar { flex-direction: column; text-align: center; }
+            .search-filter-bar { flex-direction: column; align-items: stretch; }
+            .search-box { justify-content: stretch; }
+            .search-box input { width: 100%; }
+        }
+        #chatWindow {
+            font-family: 'Inter', sans-serif;
+        }
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2d5a2c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            cursor: pointer;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .quick-reply-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border-top: 1px solid #eee;
+            background: #f9f9f9;
+        }
+        .quick-reply-buttons button {
+            background: #e8f5e9;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .file-upload-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div id="loginOverlay">
+    <div class="login-container">
+        <div class="farmer-logo">👨‍🌾🌾</div>
+        <h1>FarmDirect</h1>
+        <p>Farmer First | Zero Middlemen | Zero Profit</p>
+        <div id="loginView">
+            <input type="tel" id="loginPhone" maxlength="10" placeholder="Enter Phone Number">
+            <button onclick="sendOTP()">Send OTP</button>
+            <div id="loginMessage" style="margin-top:12px;"></div>
+        </div>
+        <div id="otpView" style="display:none;">
+            <input type="text" id="otpCode" placeholder="Enter OTP" maxlength="6">
+            <button onclick="verifyOTP()">Verify & Login</button>
+            <div id="otpMessage" style="margin-top:12px;"></div>
+        </div>
+        <div id="registerView" style="display:none;">
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="tel" id="regPhone" maxlength="10" placeholder="Phone Number">
+            <textarea id="regAddress" rows="2" placeholder="Default Delivery Address"></textarea>
+            <button onclick="registerUser()">Create Account</button>
+            <div id="regMessage" style="margin-top:12px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div id="mainContent">
+    <div class="header">
+        <h1>🌾 FarmDirect</h1>
+        <p data-lang="tagline">Fresh Produce, Directly from Farmers — Fair Price for Everyone</p>
+        <div class="badge">🤝 Farmer First | Zero Middlemen | Zero Profit on Rice</div>
+        <div class="language-selector">
+            <button onclick="setLanguage('en')">English</button>
+            <button onclick="setLanguage('te')">తెలుగు</button>
+            <button onclick="setLanguage('hi')">हिन्दी</button>
+        </div>
+        <div class="nav-menu">
+    <a href="index.html">🏠 Home</a>
+    <a href="dashboard.html">📋 Dashboard</a>
+    <a href="track.html">📍 Track Order</a>
+    <a href="farmer.html">👨‍🌾 Farmer</a>
+    <a href="about.html">🌾 About</a>
+    <a href="faq.html">❓ FAQ</a>
+    <a href="contact.html">📞 Contact</a>
+</div>
+    </div>
+
+    <div id="userInfoBar">
+        <span>🌿 <span data-lang="welcome">Welcome</span>, <strong id="userName"></strong>!</span>
+        <span>🚚 <span data-lang="estDelivery">Estimated Delivery</span>: <strong>2-3 <span data-lang="days">days</span></strong></span>
+        <button onclick="showAddressModal()">📍 Manage Addresses</button>
+        <button onclick="showWishlist()">❤️ Wishlist</button>
+        <button onclick="showNotifications()">🔔 Notifications</button>
+        <button onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="search-filter-bar">
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterCategory('all')">All</button>
+            <button class="filter-btn" onclick="filterCategory('rice')">🍚 Rice</button>
+            <button class="filter-btn" onclick="filterCategory('dal')">🫘 Dal</button>
+            <button class="filter-btn" onclick="filterCategory('spices')">🌿 Spices</button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Search products...">
+            <button onclick="searchProducts()">Search</button>
+        </div>
+    </div>
+
+    <h2 class="section-title" data-lang="ourProducts">🛒 Our Products</h2>
+    <div class="products" id="productsGrid">
+        <div class="product-card" data-category="rice" data-name="Premium Rice" onclick="openModal('Premium Rice', 44, 36, 'kg')">
+            <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist('Premium Rice')">🤍</button>
+            <div class="product-image">🍚</div>
+            <div class="product-title">Premium Rice</div>
+            <div class="price">₹44<span>/kg</span></div>
+            <div class="farmer-share">👨‍🌾 Farmer gets: ₹36/kg</div>
+            <div class="quantity-control">
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, -1)">−</button>
+                <span class="qty-value">1</span>
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-card" data-category="dal" data-name="Toor Dal" onclick="openModal('Toor Dal', 120, 90, 'kg')">
+            <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist('Toor Dal')">🤍</button>
+            <div class="product-image">🫘</div>
+            <div class="product-title">Toor Dal</div>
+            <div class="price">₹120<span>/kg</span></div>
+            <div class="farmer-share">👨‍🌾 Farmer gets: ₹90/kg</div>
+            <div class="quantity-control">
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, -1)">−</button>
+                <span class="qty-value">1</span>
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-card" data-category="dal" data-name="Moong Dal" onclick="openModal('Moong Dal', 100, 80, 'kg')">
+            <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist('Moong Dal')">🤍</button>
+            <div class="product-image">💚</div>
+            <div class="product-title">Moong Dal</div>
+            <div class="price">₹100<span>/kg</span></div>
+            <div class="farmer-share">👨‍🌾 Farmer gets: ₹80/kg</div>
+            <div class="quantity-control">
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, -1)">−</button>
+                <span class="qty-value">1</span>
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, 1)">+</button>
+            </div>
+        </div>
+        <div class="product-card" data-category="spices" data-name="Turmeric Powder" onclick="openModal('Turmeric Powder', 220, 90, 'kg')">
+            <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist('Turmeric Powder')">🤍</button>
+            <div class="product-image">🌿</div>
+            <div class="product-title">Turmeric Powder</div>
+            <div class="price">₹220<span>/kg</span></div>
+            <div class="farmer-share">👨‍🌾 Farmer gets: ₹90/kg (raw)</div>
+            <div class="quantity-control">
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, -1)">−</button>
+                <span class="qty-value">1</span>
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQty(this, 1)">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p data-lang="footer">🌾 FarmDirect — Farmer First, Zero Profit on Rice</p>
+        <p data-lang="bulk">📦 Bulk orders for PGs, Hostels, Restaurants, Offices, Households</p>
+    </div>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content"><span class="close-modal" onclick="closeAddressModal()">&times;</span><h2>📍 My Addresses</h2><div id="addressList"></div><button onclick="showAddAddressForm()" style="background:#2d5a2c; color:white; border:none; padding:10px 20px; border-radius:40px; margin-top:15px; cursor:pointer;">+ Add New Address</button><div id="addAddressForm" style="display:none; margin-top:15px;"><input type="text" id="newAddressName" placeholder="Label (Home, Office)" style="width:100%; padding:12px; margin:5px 0; border:1px solid #ccc; border-radius:12px;"><textarea id="newAddressLine" rows="2" placeholder="Full Address" style="width:100%; padding:12px; margin:5px 0; border:1px solid #ccc; border-radius:12px;"></textarea><button onclick="addAddress()" style="background:#4caf50; color:white; padding:10px; border-radius:40px; width:100%; cursor:pointer;">Save</button><button onclick="hideAddAddressForm()" style="background:#e2e8f0; padding:8px; border-radius:40px; width:100%; margin-top:8px; cursor:pointer;">Cancel</button></div><div id="addressMessage"></div></div>
+    </div>
+
+    <!-- Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h2>📦 Place Your Order</h2><div style="background:#e8f5e9; padding:15px; border-radius:20px; margin-bottom:20px;"><strong id="modal-product-name">-</strong><br>Price: ₹<span id="modal-product-price">-</span>/kg<br>Farmer gets: ₹<span id="modal-farmer-price">-</span>/kg</div><form id="orderForm"><div class="form-group"><label>Full Name *</label><input type="text" id="name" required></div><div class="form-group"><label>Phone *</label><input type="tel" id="phone" maxlength="10" required placeholder="9876543210"></div><div class="form-group">
+    <label>Email Address *</label>
+    <input type="email" id="email" required placeholder="youremail@gmail.com">
+</div><div class="form-group"><label>Delivery Address *</label><select id="addressSelect" onchange="updateAddressField()"><option value="">Select saved address</option></select><textarea id="address" rows="2" placeholder="Or enter new address" style="margin-top:10px;"></textarea></div><div class="form-group"><label>Quantity (kg) *</label><input type="number" id="quantity" value="1" min="1" max="100" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:12px;"></div><div class="form-group"><label>Delivery Date</label><input type="date" id="delivery_date"></div><div class="form-group"><label>Referral Code</label><input type="text" id="referral_code"></div><button type="submit" class="submit-btn">✅ Submit Order</button><button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button></form><div id="successMsg" class="success"></div><div id="errorMsg" class="error"></div></div>
+    </div>
+</div>
+
+<script>
+    // Config variables come from config.js
+    let currentProduct = {};
+    let loggedInUser = null;
+    let generatedOTP = null;
+    let lastReplyCount = 0;
+
+    // ========== QUANTITY ==========
+    function changeQty(btn, delta) {
+        const qtySpan = btn.parentElement.querySelector('.qty-value');
+        let qty = Math.max(1, Math.min(100, parseInt(qtySpan.innerText, 10) + delta));
+        qtySpan.innerText = qty;
+        const modalQty = document.getElementById('quantity');
+        if (modalQty && currentProduct.name === btn.closest('.product-card').querySelector('.product-title').innerText) {
+            modalQty.value = qty;
+        }
+    }
+
+    // ========== WISHLIST ==========
+    function toggleWishlist(productName) {
+        let wishlist = JSON.parse(localStorage.getItem('farmdirect_wishlist')) || [];
+        const index = wishlist.indexOf(productName);
+        index === -1 ? wishlist.push(productName) : wishlist.splice(index, 1);
+        localStorage.setItem('farmdirect_wishlist', JSON.stringify(wishlist));
+        alert(index === -1 ? `❤️ ${productName} added to wishlist` : `💔 ${productName} removed from wishlist`);
+        updateWishlistIcons();
+    }
+    function showWishlist() {
+        let wishlist = JSON.parse(localStorage.getItem('farmdirect_wishlist')) || [];
+        alert(wishlist.length === 0 ? 'Your wishlist is empty' : '❤️ Your Wishlist:\n\n' + wishlist.join('\n'));
+    }
+    function updateWishlistIcons() {
+        const wishlist = JSON.parse(localStorage.getItem('farmdirect_wishlist')) || [];
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            const name = btn.closest('.product-card').querySelector('.product-title').innerText;
+            btn.innerHTML = wishlist.includes(name) ? '❤️' : '🤍';
+        });
+    }
+
+    // ========== NOTIFICATIONS ==========
+    function showNotifications() {
+        let notifications = JSON.parse(localStorage.getItem('farmdirect_notifications')) || [];
+        if (notifications.length === 0) { alert('No new notifications'); return; }
+        let msg = '📢 Your Updates:\n\n';
+        notifications.forEach(n => { msg += `${n.timestamp}\n${n.message}\n\n`; });
+        alert(msg);
+    }
+
+    function showNewMessagePopup(message) {
+        const existingPopup = document.querySelector('.notification-popup');
+        if (existingPopup) existingPopup.remove();
+        
+        const popup = document.createElement('div');
+        popup.className = 'notification-popup';
+        popup.innerHTML = `💬 <strong>New reply from Admin:</strong><br>${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`;
+        popup.onclick = () => {
+            const chatWindow = document.getElementById('chatWindow');
+            if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+                chatWindow.style.display = 'block';
+            }
+            loadCustomerChatHistory();
+            popup.remove();
+        };
+        document.body.appendChild(popup);
+        setTimeout(() => {
+            if (popup.parentNode) popup.remove();
+        }, 8000);
+    }
+
+    // ========== LANGUAGE ==========
+    const translations = {
+        en: { tagline: "Fresh Produce, Directly from Farmers — Fair Price for Everyone", home: "🏠 Home", dashboard: "📋 Dashboard", track: "📍 Track Order", welcome: "Welcome", estDelivery: "Estimated Delivery", days: "days", ourProducts: "🛒 Our Products", footer: "🌾 FarmDirect — Farmer First, Zero Profit on Rice", bulk: "📦 Bulk orders for PGs, Hostels, Restaurants, Offices, Households" },
+        te: { tagline: "తాజా ఉత్పత్తులు, నేరుగా రైతుల నుండి — అందరికీ సరసమైన ధర", home: "🏠 హోమ్", dashboard: "📋 డ్యాష్బోర్డ్", track: "📍 ఆర్డర్ ట్రాక్", welcome: "స్వాగతం", estDelivery: "అంచనా డెలివరీ", days: "రోజులు", ourProducts: "🛒 మా ఉత్పత్తులు", footer: "🌾 ఫార్మ్డైరెక్ట్ — రైతు మొదటి, బియ్యంపై లాభం లేదు", bulk: "📦 పీజీలు, హాస్టళ్లు, రెస్టారెంట్లు, కార్యాలయాలు, కుటుంబాలకు బల్క్ ఆర్డర్లు" },
+        hi: { tagline: "ताजा उपज, सीधे किसानों से — सभी के लिए उचित मूल्य", home: "🏠 होम", dashboard: "📋 डैशबोर्ड", track: "📍 ऑर्डर ट्रैक", welcome: "स्वागत है", estDelivery: "अनुमानित डिलीवरी", days: "दिन", ourProducts: "🛒 हमारे उत्पाद", footer: "🌾 फार्मडायरेक्ट — किसान पहले, चावल पर शून्य लाभ", bulk: "📦 पीजी, हॉस्टल, रेस्तरां, कार्यालयों, परिवारों के लिए थोक ऑर्डर" }
+    };
+    let currentLang = 'en';
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-lang]').forEach(el => { const key = el.getAttribute('data-lang'); if (translations[lang][key]) el.textContent = translations[lang][key]; });
+        localStorage.setItem('farmdirect_lang', lang);
+    }
+    function loadLanguage() { const saved = localStorage.getItem('farmdirect_lang'); if (saved && translations[saved]) setLanguage(saved); else setLanguage('en'); }
+
+    // ========== LOGIN ==========
+    function showLoginView() { document.getElementById('loginView').style.display = 'block'; document.getElementById('otpView').style.display = 'none'; document.getElementById('registerView').style.display = 'none'; }
+    function sendOTP() {
+        const phone = document.getElementById('loginPhone').value.trim();
+        if (!/^[6-9]\d{9}$/.test(phone)) { document.getElementById('loginMessage').innerHTML = '<div style="color:#c62828;">❌ Enter valid 10-digit number</div>'; return; }
+        const users = JSON.parse(localStorage.getItem('farmdirect_users')) || [];
+        const user = users.find(u => u.phone === phone);
+        if (user) {
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            alert(`Your OTP is: ${generatedOTP}`);
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('otpView').style.display = 'block';
+            document.getElementById('otpMessage').innerHTML = '<div style="color:#2e7d32;">✅ OTP sent! Check alert box.</div>';
+        } else {
+            document.getElementById('regPhone').value = phone;
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('registerView').style.display = 'block';
+        }
+    }
+    function verifyOTP() {
+        const enteredOTP = document.getElementById('otpCode').value.trim();
+        if (enteredOTP === generatedOTP) {
+            const phone = document.getElementById('loginPhone').value;
+            const users = JSON.parse(localStorage.getItem('farmdirect_users')) || [];
+            const user = users.find(u => u.phone === phone);
+            loggedInUser = user;
+            localStorage.setItem('farmdirect_user', JSON.stringify(user));
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('userName').innerText = user.name;
+            loadAddresses();
+            updateWishlistIcons();
+            loadCustomerChatHistory();
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission();
+            }
+        } else { document.getElementById('otpMessage').innerHTML = '<div style="color:#c62828;">❌ Invalid OTP</div>'; }
+    }
+    function registerUser() {
+        const name = document.getElementById('regName').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        const address = document.getElementById('regAddress').value.trim();
+        if (!name || !phone || !address) { document.getElementById('regMessage').innerHTML = '<div style="color:#c62828;">❌ Please fill all fields</div>'; return; }
+        if (!/^[6-9]\d{9}$/.test(phone)) { document.getElementById('regMessage').innerHTML = '<div style="color:#c62828;">❌ Enter valid 10-digit phone number</div>'; return; }
+        const users = JSON.parse(localStorage.getItem('farmdirect_users')) || [];
+        users.push({ name, phone, address, registeredAt: new Date().toLocaleString() });
+        localStorage.setItem('farmdirect_users', JSON.stringify(users));
+        loggedInUser = { name, phone, address };
+        localStorage.setItem('farmdirect_user', JSON.stringify(loggedInUser));
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('userName').innerText = name;
+        loadAddresses();
+        updateWishlistIcons();
+        loadCustomerChatHistory();
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+    }
+    function logout() {
+        localStorage.removeItem('farmdirect_user');
+        loggedInUser = null;
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('loginOverlay').style.display = 'flex';
+        showLoginView();
+        document.getElementById('loginPhone').value = '';
+    }
+
+    // ========== ADDRESSES ==========
+    function loadAddresses() {
+        const addresses = JSON.parse(localStorage.getItem(`addresses_${loggedInUser?.phone}`)) || [];
+        if (addresses.length === 0 && loggedInUser?.address) { addresses.push({ label: 'Home', address: loggedInUser.address }); localStorage.setItem(`addresses_${loggedInUser.phone}`, JSON.stringify(addresses)); }
+        const select = document.getElementById('addressSelect');
+        if (select) { select.innerHTML = '<option value="">Select saved address</option>'; addresses.forEach((addr, idx) => { select.innerHTML += `<option value="${idx}">${addr.label}: ${addr.address.substring(0, 50)}...</option>`; }); }
+        return addresses;
+    }
+    function updateAddressField() { const idx = document.getElementById('addressSelect').value; if (idx !== '') { const addresses = JSON.parse(localStorage.getItem(`addresses_${loggedInUser?.phone}`)) || []; if (addresses[idx]) document.getElementById('address').value = addresses[idx].address; } }
+    function showAddressModal() {
+        loadAddresses();
+        const addresses = JSON.parse(localStorage.getItem(`addresses_${loggedInUser?.phone}`)) || [];
+        const container = document.getElementById('addressList');
+        container.innerHTML = '';
+        addresses.forEach((addr, idx) => { container.innerHTML += `<div style="background:#f1f5f9; padding:12px; border-radius:16px; margin-bottom:10px;"><strong>${addr.label}</strong><br>${addr.address}<br><button onclick="deleteAddress(${idx})" style="background:#f44336; color:white; border:none; padding:4px 12px; border-radius:20px; margin-top:8px; cursor:pointer;">Delete</button></div>`; });
+        document.getElementById('addressModal').style.display = 'flex';
+    }
+    function closeAddressModal() { document.getElementById('addressModal').style.display = 'none'; }
+    function showAddAddressForm() { document.getElementById('addAddressForm').style.display = 'block'; }
+    function hideAddAddressForm() { document.getElementById('addAddressForm').style.display = 'none'; }
+    function addAddress() {
+        const label = document.getElementById('newAddressName').value.trim();
+        const address = document.getElementById('newAddressLine').value.trim();
+        if (!label || !address) { document.getElementById('addressMessage').innerHTML = '<div style="color:#c62828;">❌ Please fill both fields</div>'; return; }
+        const addresses = JSON.parse(localStorage.getItem(`addresses_${loggedInUser?.phone}`)) || [];
+        addresses.push({ label, address });
+        localStorage.setItem(`addresses_${loggedInUser?.phone}`, JSON.stringify(addresses));
+        document.getElementById('newAddressName').value = '';
+        document.getElementById('newAddressLine').value = '';
+        hideAddAddressForm();
+        loadAddresses();
+        showAddressModal();
+        document.getElementById('addressMessage').innerHTML = '<div style="color:#2e7d32;">✅ Address added!</div>';
+        setTimeout(() => { document.getElementById('addressMessage').innerHTML = ''; }, 2000);
+    }
+    function deleteAddress(idx) { let addresses = JSON.parse(localStorage.getItem(`addresses_${loggedInUser?.phone}`)) || []; addresses.splice(idx, 1); localStorage.setItem(`addresses_${loggedInUser?.phone}`, JSON.stringify(addresses)); loadAddresses(); showAddressModal(); }
+
+    // ========== CHAT ==========
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+            chatWindow.style.display = 'block';
+            if (loggedInUser) { loadCustomerChatHistory(); }
+        } else { chatWindow.style.display = 'none'; }
+    }
+
+    function sendQuickReply(message) {
+        document.getElementById('chatInput').value = message;
+        sendChatMessage();
+    }
+
+    async function uploadImage() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const imageData = event.target.result;
+                const chatMessages = document.getElementById('chatMessages');
+                const userName = loggedInUser ? loggedInUser.name : 'Guest';
+                const userPhone = loggedInUser ? loggedInUser.phone : 'Not logged in';
+                
+                const imgDiv = document.createElement('div');
+                imgDiv.style.cssText = 'text-align: right; margin-bottom: 8px;';
+                imgDiv.innerHTML = `<div style="background: #2d5a2c; color: white; padding: 8px 12px; border-radius: 15px; display: inline-block; max-width: 85%;"><img src="${imageData}" style="max-width: 200px; max-height: 150px; border-radius: 10px;"><br>📷 Image shared</div>`;
+                chatMessages.appendChild(imgDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                try {
+                    await fetch(CHAT_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'sendMessage',
+                            name: userName,
+                            phone: userPhone,
+                            message: `📷 Image shared`
+                        })
+                    });
+                } catch(err) { console.error(err); }
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    }
+
+    async function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+        const chatMessages = document.getElementById('chatMessages');
+        const userName = loggedInUser ? loggedInUser.name : 'Guest';
+        const userPhone = loggedInUser ? loggedInUser.phone : 'Not logged in';
+        const userMsgDiv = document.createElement('div');
+        userMsgDiv.style.cssText = 'text-align: right; margin-bottom: 8px;';
+        userMsgDiv.innerHTML = `<div style="background: #2d5a2c; color: white; padding: 8px 12px; border-radius: 15px; display: inline-block; max-width: 85%;">${message}</div>`;
+        chatMessages.appendChild(userMsgDiv);
+        input.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        try { await fetch(CHAT_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'sendMessage', name: userName, phone: userPhone, message: message }) }); } catch(err) { console.error(err); }
+        setTimeout(() => { loadCustomerChatHistory(); }, 500);
+    }
+    
+    async function loadCustomerChatHistory() {
+        const userPhone = loggedInUser ? loggedInUser.phone : null;
+        if (!userPhone) return;
+        
+        try {
+            const response = await fetch(CHAT_SCRIPT_URL);
+            const data = await response.json();
+            if (!data.success) return;
+            
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+            
+            const userChats = data.chats.filter(c => c.phone === userPhone);
+            
+            let totalReplies = 0;
+            userChats.forEach(chat => { 
+                if (chat.reply && chat.reply !== '') {
+                    totalReplies++;
+                }
+            });
+            
+            if (totalReplies > lastReplyCount && lastReplyCount !== 0) {
+                const newestReply = userChats.find(chat => chat.reply && chat.reply !== '');
+                if (newestReply && newestReply.reply) {
+                    showNewMessagePopup(newestReply.reply);
+                    if (Notification.permission === 'granted') {
+                        new Notification('FarmDirect - New Message', {
+                            body: `Admin: ${newestReply.reply.substring(0, 100)}`,
+                            icon: '🌾'
+                        });
+                    }
+                }
+            }
+            lastReplyCount = totalReplies;
+            
+            const greeting = chatMessages.firstChild;
+            const greetingClone = greeting ? greeting.cloneNode(true) : null;
+            chatMessages.innerHTML = '';
+            if (greetingClone) chatMessages.appendChild(greetingClone);
+            
+            userChats.forEach(chat => {
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.style.cssText = 'text-align: right; margin-bottom: 8px;';
+                userMsgDiv.innerHTML = `<div style="background: #2d5a2c; color: white; padding: 8px 12px; border-radius: 15px; display: inline-block; max-width: 85%;">${chat.message}</div>`;
+                chatMessages.appendChild(userMsgDiv);
+                
+                if (chat.reply && chat.reply !== '') {
+                    const replyDiv = document.createElement('div');
+                    replyDiv.style.cssText = 'text-align: left; margin-bottom: 8px;';
+                    replyDiv.innerHTML = `<div style="background: #e3f2fd; padding: 8px 12px; border-radius: 15px; display: inline-block; max-width: 85%;">
+                        <strong>Admin:</strong> ${chat.reply}<br>
+                        <span style="font-size:0.7rem;">${chat.replyTime || ''}</span>
+                    </div>`;
+                    chatMessages.appendChild(replyDiv);
+                }
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        } catch(err) {
+            console.error('Error loading chat history:', err);
+        }
+    }
+
+    // ========== SEARCH & CATEGORY ==========
+    function filterCategory(category) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        document.querySelectorAll('.product-card').forEach(product => { product.style.display = (category === 'all' || product.dataset.category === category) ? 'block' : 'none'; });
+    }
+    function searchProducts() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(product => { product.style.display = product.dataset.name.toLowerCase().includes(term) ? 'block' : 'none'; });
+    }
+
+    // ========== ORDER ==========
+    function openModal(name, price, farmerPrice, unit) {
+        currentProduct = { 
+            name: name, 
+            price: parseFloat(price), 
+            farmerPrice: parseFloat(farmerPrice), 
+            unit: unit 
+        };
+        document.getElementById('modal-product-name').innerText = name;
+        document.getElementById('modal-product-price').innerText = currentProduct.price;
+        document.getElementById('modal-farmer-price').innerText = currentProduct.farmerPrice;
+        document.getElementById('orderModal').style.display = 'flex';
+        if (loggedInUser) { 
+            document.getElementById('name').value = loggedInUser.name; 
+            document.getElementById('phone').value = loggedInUser.phone; 
+            document.getElementById('address').value = loggedInUser.address; 
+        }
+        const productCard = Array.from(document.querySelectorAll('.product-card')).find(card => card.querySelector('.product-title').innerText === name);
+        if (productCard) { 
+            const qtySpan = productCard.querySelector('.qty-value'); 
+            if (qtySpan) {
+                const qty = parseInt(qtySpan.innerText, 10);
+                document.getElementById('quantity').value = qty;
+            }
+        }
+        loadAddresses();
+    }
+    function closeModal() { 
+        document.getElementById('orderModal').style.display = 'none'; 
+        document.getElementById('successMsg').style.display = 'none';
+        document.getElementById('errorMsg').style.display = 'none';
+    }
+    function validatePhone(p) { return /^[6-9]\d{9}$/.test(p); }
+    
+    document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const phone = document.getElementById('phone').value;
+        if (!validatePhone(phone)) { 
+            alert('❌ Enter valid 10-digit mobile number'); 
+            return; 
+        }
+        
+        const qty = parseInt(document.getElementById('quantity').value, 10);
+        const price = parseFloat(currentProduct.price);
+        const total = price * qty;
+        
+        if (isNaN(total) || total <= 0) {
+            alert('❌ Price calculation error. Please refresh and try again.');
+            return;
+        }
+        
+        const orderData = { 
+            orderId: Date.now(), 
+            product: currentProduct.name, 
+            quantity: qty, 
+            total: total, 
+            name: document.getElementById('name').value, 
+            phone: phone, 
+            email: document.getElementById('email').value,
+            address: document.getElementById('address').value, 
+            delivery_date: document.getElementById('delivery_date').value, 
+            referral_code: document.getElementById('referral_code').value, 
+            status: 'placed', 
+            timestamp: new Date().toLocaleString() 
+        };
+        
+        try {
+            await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(orderData) 
+            });
+            
+            // Send email notification
+// Send invoice email
+try {
+    if (typeof EMAIL_SCRIPT_URL !== 'undefined' && EMAIL_SCRIPT_URL && orderData.email) {
+        await fetch(EMAIL_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: orderData.email,
+                orderId: orderData.orderId,
+                name: orderData.name,
+                phone: orderData.phone,
+                address: orderData.address,
+                product: orderData.product,
+                quantity: orderData.quantity,
+                total: orderData.total,
+                date: new Date().toLocaleString()
+            })
+        });
+        console.log('Invoice email sent to:', orderData.email);
+    }
+} catch(emailErr) {
+    console.log('Email failed:', emailErr);
+}
+            
+            let orders = JSON.parse(localStorage.getItem('farmdirect_orders')) || [];
+            orders.unshift(orderData);
+            localStorage.setItem('farmdirect_orders', JSON.stringify(orders));
+            
+            const msg = `*FARMDIRECT ORDER*%0AOrder ID: ${orderData.orderId}%0AProduct: ${orderData.product}%0AQty: ${orderData.quantity} kg%0ATotal: ₹${orderData.total}%0AName: ${orderData.name}%0APhone: ${orderData.phone}%0AAddress: ${orderData.address}`;
+            
+            const farmerShare = Math.round(orderData.total * 0.82);
+            const platformShare = 0;
+            const deliveryCost = Math.round(orderData.total * 0.18);
+
+            document.getElementById('successMsg').innerHTML = `
+                <div style="text-align:center;">
+                    <h3>✅ Order Confirmed!</h3>
+                    <p><strong>Order ID:</strong> ${orderData.orderId}</p>
+                    <p><strong>Total Amount:</strong> ₹${orderData.total}</p>
+                    <hr style="margin:15px 0;">
+                    <p style="background:#e8f5e9; padding:10px; border-radius:10px;">
+                        🌾 <strong>Your Payment Breakdown:</strong><br>
+                        👨‍🌾 <strong>Farmer gets: ₹${farmerShare}</strong> (82%)<br>
+                        🚚 Delivery & Packaging: ₹${deliveryCost} (18%)<br>
+                        💚 FarmDirect Profit: ₹${platformShare} (0%)
+                    </p>
+                    <p>🙏 Thank you for supporting farmers directly!</p>
+                    <a href="https://wa.me/${YOUR_WHATSAPP}?text=${msg}" target="_blank" class="whatsapp-btn">📲 Confirm on WhatsApp</a><br>
+                    <a href="dashboard.html" style="display:inline-block; margin-top:10px;">📋 View Dashboard</a>
+                </div>
+            `;
+            document.getElementById('successMsg').style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('orderForm').reset();
+            
+            setTimeout(() => closeModal(), 8000);
+        } catch(err) { 
+            console.error('Order error:', err);
+            document.getElementById('errorMsg').style.display = 'block'; 
+        }
+    });
+    
+    window.onclick = function(e) { if (e.target === document.getElementById('orderModal')) closeModal(); };
+
+    loadLanguage();
+    showLoginView();
+    const savedUser = localStorage.getItem('farmdirect_user');
+    if (savedUser) {
+        loggedInUser = JSON.parse(savedUser);
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('userName').innerText = loggedInUser.name;
+        loadAddresses();
+        updateWishlistIcons();
+        loadCustomerChatHistory();
+    }
+</script>
+
+<!-- Chat Widget -->
+<div id="chatWidget" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+    <div id="chatButton" onclick="toggleChat()" style="background: #4caf50; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">💬</div>
+    <div id="chatWindow" style="display: none; position: absolute; bottom: 70px; right: 0; width: 350px; background: white; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden;">
+        <div style="background: #2d5a2c; color: white; padding: 12px 15px; font-weight: bold;">
+            FarmDirect Support
+            <span onclick="loadCustomerChatHistory()" style="float: right; cursor: pointer; margin-right: 10px;">🔄</span>
+            <span onclick="toggleChat()" style="float: right; cursor: pointer;">✕</span>
+        </div>
+        <div id="chatMessages" style="height: 300px; overflow-y: auto; padding: 10px; background: #f5f5f5;"><div style="background: #e8f5e9; padding: 8px 12px; border-radius: 15px; margin-bottom: 8px; max-width: 85%;">👋 Hello! How can I help you?</div></div>
+        <div class="quick-reply-buttons">
+            <button onclick="sendQuickReply('What is the price of rice?')">💰 Price</button>
+            <button onclick="sendQuickReply('When will my order be delivered?')">🚚 Delivery</button>
+            <button onclick="sendQuickReply('How is the quality of rice?')">🌾 Quality</button>
+            <button onclick="sendQuickReply('I want to cancel my order')">❌ Cancel</button>
+            <button onclick="uploadImage()" class="file-upload-btn">📷 Upload Image</button>
+        </div>
+        <div style="display: flex; padding: 10px; border-top: 1px solid #ddd;">
+            <input type="text" id="chatInput" placeholder="Type your message..." style="flex: 1; padding: 8px 12px; border: 1px solid #ccc; border-radius: 20px;">
+            <button onclick="sendChatMessage()" style="background: #4caf50; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin-left: 8px; cursor: pointer;">Send</button>
+        </div>
+    </div>
+</div>
+<!-- AI Chatbot Widget -->
+<!-- AI Chatbot Widget with Voice -->
+<!-- AI Chatbot Widget with Voice -->
+<div id="aiChatbot" style="position: fixed; bottom: 90px; right: 20px; z-index: 1000;">
+    <div id="aiChatButton" onclick="toggleAIChat()" style="background: #4caf50; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 1.5rem;">
+        🤖
+    </div>
+    <div id="aiChatWindow" style="display: none; position: absolute; bottom: 70px; right: 0; width: 380px; background: white; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #ddd;">
+        <div style="background: #2d5a2c; color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+            <span>🤖 FarmDirect AI Assistant</span>
+            <div>
+                <button id="voiceBtn" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-right: 10px;" title="Click to speak">🎤</button>
+                <span onclick="toggleAIChat()" style="cursor: pointer;">✕</span>
+            </div>
+        </div>
+        <div id="aiChatMessages" style="height: 350px; overflow-y: auto; padding: 10px; background: #f5f5f5;">
+            <div style="background: #e8f5e9; padding: 8px 12px; border-radius: 15px; margin-bottom: 8px; max-width: 85%;">
+                👋 Hello! I'm FarmDirect AI Assistant. You can:<br>
+                • Type your question<br>
+                • 🎤 Click the mic and SPEAK<br>
+                • I will READ the answers aloud!
+            </div>
+        </div>
+        <div style="display: flex; padding: 10px; border-top: 1px solid #ddd; gap: 8px;">
+            <input type="text" id="aiChatInput" placeholder="Type or speak your question..." style="flex: 1; padding: 8px 12px; border: 1px solid #ccc; border-radius: 20px;">
+            <button onclick="sendAIMessage()" style="background: #4caf50; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;">Send</button>
+        </div>
+        <div id="voiceStatus" style="padding: 5px; text-align: center; font-size: 0.7rem; color: #ff9800; display: none;">🎤 Listening... Speak now</div>
+        <div style="padding: 8px; text-align: center; font-size: 0.7rem; color: #888; border-top: 1px solid #eee;">
+            💡 Speak naturally - I'll answer & speak back
+        </div>
+    </div>
+</div>
+
+<script>
+    let aiChatOpen = false;
+    let recognition = null;
+    let isListening = false;
+    
+    // Initialize speech recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-IN';
+        
+        recognition.onstart = function() {
+            isListening = true;
+            document.getElementById('voiceStatus').style.display = 'block';
+            document.getElementById('voiceStatus').innerHTML = '🎤 Listening... Speak now';
+            const voiceBtn = document.getElementById('voiceBtn');
+            if (voiceBtn) voiceBtn.style.color = '#ff9800';
+        };
+        
+        recognition.onend = function() {
+            isListening = false;
+            document.getElementById('voiceStatus').style.display = 'none';
+            const voiceBtn = document.getElementById('voiceBtn');
+            if (voiceBtn) voiceBtn.style.color = 'white';
+        };
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('aiChatInput').value = transcript;
+            sendAIMessage();
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('Speech error:', event.error);
+            document.getElementById('voiceStatus').innerHTML = '❌ Could not hear you. Please try again.';
+            setTimeout(() => {
+                document.getElementById('voiceStatus').style.display = 'none';
+                document.getElementById('voiceStatus').innerHTML = '🎤 Listening... Speak now';
+            }, 2000);
+            isListening = false;
+        };
+    } else {
+        console.log('Speech recognition not supported');
+    }
+    
+    function toggleAIChat() {
+        const window = document.getElementById('aiChatWindow');
+        if (window.style.display === 'none' || window.style.display === '') {
+            window.style.display = 'block';
+        } else {
+            window.style.display = 'none';
+            if (recognition && isListening) recognition.stop();
+        }
+    }
+    
+    function startVoiceInput() {
+    if (!recognition) {
+        alert('Voice recognition not supported. Please use Chrome.');
+        return;
+    }
+    if (isListening) {
+        recognition.stop();
+    } else {
+        try {
+            document.getElementById('voiceStatus').style.display = 'block';
+            document.getElementById('voiceStatus').innerHTML = '🎤 Listening... Speak now';
+            recognition.start();
+        } catch(e) {
+            console.log('Recognition error:', e);
+        }
+    }
+}
+    
+    // Text-to-Speech function
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const cleanText = text.replace(/[^\w\s\u0980-\u09FF\u0900-\u097F\u0C00-\u0C7F.,!?]/g, '');
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'en-IN';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            setTimeout(() => {
+                window.speechSynthesis.speak(utterance);
+            }, 100);
+        }
+    }
+    
+    // Voice button click handler
+    document.getElementById('voiceBtn')?.addEventListener('click', startVoiceInput);
+    
+    async function sendAIMessage() {
+    const input = document.getElementById('aiChatInput');
+    const message = input.value.trim().toLowerCase();
+    
+    if (!message) return;
+    
+    const chatMessages = document.getElementById('aiChatMessages');
+    
+    // Add user message
+    const userMsgDiv = document.createElement('div');
+    userMsgDiv.style.cssText = 'text-align: right; margin-bottom: 8px;';
+    userMsgDiv.innerHTML = `<div style="background: #2d5a2c; color: white; padding: 8px 12px; border-radius: 15px; display: inline-block; max-width: 85%;">${input.value.trim()}</div>`;
+    chatMessages.appendChild(userMsgDiv);
+    input.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'aiTyping';
+    typingDiv.style.cssText = 'text-align: left; margin-bottom: 8px;';
+    typingDiv.innerHTML = `<div style="background: #e8f5e9; padding: 8px 12px; border-radius: 15px; display: inline-block;">🤖 Thinking...</div>`;
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    setTimeout(() => {
+        document.getElementById('aiTyping')?.remove();
+        
+        let reply = "";
+        
+        if (message.includes("price") || message.includes("cost")) {
+            if (message.includes("rice")) reply = "Premium Rice is ₹44/kg. Farmer gets ₹36 (82%).";
+            else reply = "Prices: Rice ₹44/kg, Toor Dal ₹120/kg, Moong Dal ₹100/kg, Turmeric ₹220/kg. FarmDirect takes ZERO profit!";
+        }
+        else if (message.includes("delivery")) {
+            reply = "Delivery takes 2-5 business days in Hyderabad. Track your order on the Track Order page.";
+        }
+        else if (message.includes("farmer")) {
+            reply = "Farmers get 82% of your payment! FarmDirect takes ZERO profit.";
+        }
+        else if (message.includes("cancel")) {
+            reply = "Cancel within 2 hours from Dashboard.";
+        }
+        else if (message.includes("track")) {
+            reply = "Go to Track Order page and enter your Order ID.";
+        }
+        else if (message.includes("contact")) {
+            reply = "Contact us at +91 6302588948 on WhatsApp.";
+        }
+        else if (message.includes("hello") || message.includes("hi")) {
+            reply = "Hello! Welcome to FarmDirect. How can I help you?";
+        }
+        else {
+            reply = "I'm not sure. Contact support at +91 6302588948 for help.";
+        }
+        
+        const aiMsgDiv = document.createElement('div');
+        aiMsgDiv.style.cssText = 'text-align: left; margin-bottom: 8px;';
+        aiMsgDiv.innerHTML = `<div style="background: #e8f5e9; padding: 8px 12px; border-radius: 15px; display: inline-block; max-width: 85%;">🤖 ${reply}</div>`;
+        chatMessages.appendChild(aiMsgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Speak the answer
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(reply);
+            utterance.lang = 'en-IN';
+            utterance.rate = 0.9;
+            setTimeout(() => window.speechSynthesis.speak(utterance), 100);
+        }
+    }, 500);
+}
+    
+    // Allow Enter key to send message
+    document.getElementById('aiChatInput')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendAIMessage();
+        }
+    });
+</script>
+</body>
+</html>

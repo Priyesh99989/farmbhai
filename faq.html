@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs - FarmDirect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7f0 0%, #e8f0e5 100%); color: #1e3a1e; }
+        .header { background: linear-gradient(135deg, #1e3a1e, #2d5a2c); color: white; text-align: center; padding: 32px 20px; }
+        .header h1 { font-size: 2rem; }
+        .nav-menu { text-align: center; margin-top: 20px; }
+        .nav-menu a { color: white; margin: 0 15px; text-decoration: none; }
+        .container { max-width: 900px; margin: 40px auto; background: white; border-radius: 32px; padding: 40px; box-shadow: 0 10px 30px -15px rgba(0,0,0,0.1); }
+        .faq-item { border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .faq-question { background: #f8fafc; padding: 15px; border-radius: 15px; cursor: pointer; font-weight: 600; margin-bottom: 5px; }
+        .faq-question:hover { background: #e8f5e9; }
+        .faq-answer { padding: 0 15px 15px 15px; color: #555; line-height: 1.6; display: none; }
+        .faq-answer.show { display: block; }
+        h2 { color: #2d5a2c; margin-bottom: 20px; }
+        .footer { text-align: center; padding: 30px; color: #5a6e5a; border-top: 1px solid #e2e8f0; margin-top: 40px; }
+        @media (max-width: 768px) { .container { margin: 20px; padding: 25px; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❓ Frequently Asked Questions</h1>
+        <p>FarmDirect - Farmer First | Zero Profit on Rice</p>
+        <div class="nav-menu">
+            <a href="index.html">🏠 Home</a>
+            <a href="faq.html">❓ FAQ</a>
+            <a href="contact.html">📞 Contact</a>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🌾 General Questions</h2>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">🤔 What is FarmDirect?</div>
+            <div class="faq-answer">FarmDirect is a platform that connects customers directly with farmers. We take ZERO profit on rice - 82% of your payment goes to farmers.</div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">💰 How does FarmDirect make money?</div>
+            <div class="faq-answer">We take ZERO profit on rice. Delivery charges cover actual transportation and packaging costs only. This is a social impact project, not a profit-making business.</div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">🚚 How long does delivery take?</div>
+            <div class="faq-answer">Delivery usually takes 2-5 business days. You can track your order status on the Track Order page.</div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">📍 Where do you deliver?</div>
+            <div class="faq-answer">Currently we deliver only in Hyderabad. We are expanding to more cities soon.</div>
+        </div>
+        
+        <h2>📦 Order Questions</h2>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">❌ How can I cancel my order?</div>
+            <div class="faq-answer">Go to Dashboard → Find your order → Click "Cancel Order". Orders can be cancelled within 2 hours of placement.</div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">📄 How do I get an invoice?</div>
+            <div class="faq-answer">Go to Dashboard → Find your order → Click "Invoice" button. You can print or save as PDF.</div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">⭐ Can I rate products?</div>
+            <div class="faq-answer">Yes! After your order is delivered, you can rate the product from your Dashboard (1-5 stars).</div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">🔔 Will I get order updates?</div>
+            <div class="faq-answer">Yes, you will receive WhatsApp confirmation and email invoice. You can also check order status on Track Order page.</div>
+        </div>
+        
+        <h2>👨‍🌾 Farmer Questions</h2>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">🌾 How do I register as a farmer?</div>
+            <div class="faq-answer">Contact us at +91 6302588948 or support@farmdirect.com. We will add you to our farmer network.</div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">💰 When do farmers get paid?</div>
+            <div class="faq-answer">Farmers receive 82% of order value within 7 days of delivery confirmation.</div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>🌾 FarmDirect — Farmer First, Zero Profit on Rice</p>
+    </div>
+    
+    <script>
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            answer.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
