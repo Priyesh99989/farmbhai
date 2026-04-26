@@ -360,6 +360,59 @@
             cursor: pointer;
             font-size: 0.75rem;
         }
+        /* AI Chatbot Avatar */
+.ai-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ai-avatar:hover {
+    transform: scale(1.05);
+}
+
+.ai-avatar.listening {
+    animation: listeningPulse 0.8s ease-in-out infinite;
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    box-shadow: 0 0 20px rgba(255,152,0,0.5);
+}
+
+.ai-avatar.speaking {
+    animation: speakingWave 0.5s ease-in-out infinite;
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+}
+
+.ai-avatar.thinking {
+    animation: thinkingRotate 1s ease-in-out infinite;
+    background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+}
+
+@keyframes listeningPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
+    50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(76,175,80,0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+}
+
+@keyframes speakingWave {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); border-radius: 40% 60% 40% 60%; }
+    100% { transform: scale(1); border-radius: 50%; }
+}
+
+@keyframes thinkingRotate {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
     </style>
 </head>
 <body>
@@ -1018,8 +1071,8 @@ try {
 <!-- AI Chatbot Widget -->
 <!-- AI Chatbot Widget with Voice -->
 <!-- AI Chatbot Widget with Voice -->
-<div id="aiChatbot" style="position: fixed; bottom: 90px; right: 20px; z-index: 1000;">
-    <div id="aiChatButton" onclick="toggleAIChat()" style="background: #4caf50; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 1.5rem;">
+<div id="aiChatbot" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+    <div id="aiAvatar" class="ai-avatar" onclick="toggleAIChat()">
         🤖
     </div>
     <div id="aiChatWindow" style="display: none; position: absolute; bottom: 70px; right: 0; width: 380px; background: white; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #ddd;">
@@ -1071,11 +1124,13 @@ try {
         };
         
         recognition.onend = function() {
-            isListening = false;
-            document.getElementById('voiceStatus').style.display = 'none';
-            const voiceBtn = document.getElementById('voiceBtn');
-            if (voiceBtn) voiceBtn.style.color = 'white';
-        };
+    isListening = false;
+    document.getElementById('voiceStatus').style.display = 'none';
+    const voiceBtn = document.getElementById('voiceBtn');
+    if (voiceBtn) voiceBtn.style.color = 'white';
+    const avatar = document.getElementById('aiAvatar');
+    if (avatar) avatar.classList.remove('listening');
+};
         
         recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
@@ -1107,37 +1162,51 @@ try {
     }
     
     function startVoiceInput() {
+    const avatar = document.getElementById('aiAvatar');
     if (!recognition) {
         alert('Voice recognition not supported. Please use Chrome.');
         return;
     }
     if (isListening) {
         recognition.stop();
+        if (avatar) avatar.classList.remove('listening');
     } else {
         try {
+            if (avatar) avatar.classList.add('listening');
             document.getElementById('voiceStatus').style.display = 'block';
             document.getElementById('voiceStatus').innerHTML = '🎤 Listening... Speak now';
             recognition.start();
         } catch(e) {
             console.log('Recognition error:', e);
+            if (avatar) avatar.classList.remove('listening');
         }
     }
 }
     
     // Text-to-Speech function
     function speakText(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const cleanText = text.replace(/[^\w\s\u0980-\u09FF\u0900-\u097F\u0C00-\u0C7F.,!?]/g, '');
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = 'en-IN';
-            utterance.rate = 0.9;
-            utterance.pitch = 1;
-            setTimeout(() => {
-                window.speechSynthesis.speak(utterance);
-            }, 100);
-        }
+    const avatar = document.getElementById('aiAvatar');
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/[^\w\s\u0980-\u09FF\u0900-\u097F\u0C00-\u0C7F.,!?]/g, '');
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'en-IN';
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        
+        if (avatar) avatar.classList.add('speaking');
+        
+        utterance.onend = function() {
+            if (avatar) avatar.classList.remove('speaking');
+        };
+        
+        utterance.onerror = function() {
+            if (avatar) avatar.classList.remove('speaking');
+        };
+        
+        setTimeout(() => window.speechSynthesis.speak(utterance), 100);
     }
+}
     
     // Voice button click handler
     document.getElementById('voiceBtn')?.addEventListener('click', startVoiceInput);
